@@ -1,10 +1,13 @@
-group 'mcbans'
-version '4.5.1'
+import org.apache.tools.ant.filters.ReplaceTokens
 
 apply plugin: 'java'
 apply plugin: 'maven'
 
-sourceCompatibility = 1.8
+group 'mcbans'
+version '4.5.1'
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
 
 repositories {
     mavenCentral()
@@ -16,28 +19,27 @@ repositories {
         url 'http://repo.md-5.net/content/repositories/snapshots/'
     }
     maven {
-        url 'http://ci.synload.com/plugin/repository/everything/'
+        name = 'spigotmc-repo'
+        url = 'https://hub.spigotmc.org/nexus/content/groups/public/'
     }
     maven {
-        url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+        name = 'sonatype'
+        url = 'https://oss.sonatype.org/content/groups/public/'
     }
 }
 
 dependencies {
-    compile group: 'org.bukkit', name: 'bukkit', version: '1.14.4-R0.1-SNAPSHOT'
+    compileOnly 'org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT'
     compile group: 'de.diddiz', name: 'logblock', version: '1.13.1-SNAPSHOT'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: "http://nexus.synload.com/repository/releases/") {
-                authentication(userName: "admin", password: "$System.env.PASSWORD")
-            }
-            pom.version = "${version}"
-            pom.artifactId = "mcbans-bukkit"
-            pom.groupId = "com.mcbans"
-        }
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        filter ReplaceTokens, tokens: [version: version]
     }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
 }
